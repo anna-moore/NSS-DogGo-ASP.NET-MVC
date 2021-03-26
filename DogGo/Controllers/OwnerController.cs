@@ -1,6 +1,4 @@
-﻿f the exercises in the previous chapter, you should have already created an OwnerRepository that has a method for getting all owners and getting a single owner by Id. We'll need additional CRUD functionality in the repository for this chapter, so update OwnerRepository to have the following code
-
-using DogGo.Models;
+﻿using DogGo.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 

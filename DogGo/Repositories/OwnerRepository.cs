@@ -179,5 +179,15 @@ namespace DogGo.Repositories
                 }
             }
         }
+
+        public List<Owner> GetAllOwners()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Owner GetOwnersById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
