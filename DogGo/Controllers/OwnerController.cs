@@ -1,178 +1,104 @@
 ﻿using DogGo.Models;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using DogGo.Repositories;
 
-namespace DogGo.Repositories
+namespace DogGo.Controllers
 {
-    public class OwnerRepository : IOwnerRepository
+    public class OwnersController : Controller
     {
-        private readonly IConfiguration _config;
+        private readonly IOwnerRepository _ownerRepo;
 
-        // The constructor accepts an IConfiguration object as a parameter. This class comes from the ASP.NET framework and is useful for retrieving things out of the appsettings.json file like connection strings.
-        public OwnerRepository(IConfiguration config)
+        // ASP.NET will give us an instance of our OWNER Repository. This is called "Dependency Injection"
+        public OwnersController(IOwnerRepository ownerRepository)
         {
-            _config = config;
+            _ownerRepo = ownerRepository;
         }
 
-        public SqlConnection Connection
+        // GET: Owners
+        public ActionResult Index()
         {
-            get
+            List<Owner> owners = _ownerRepo.GetAllOwners();
+
+            return View(owners);
+        }
+
+        // GET: Owners/Details/5
+        public ActionResult Details(int id)
+        {
+            Owner owner = _ownerRepo.GetOwnersById(id);
+
+            if (owner == null)
             {
-                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+                return NotFound();
+            }
+
+            return View(owner);
+        }
+
+        // GET: OwnerController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: OwnerController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(IFormCollection collection)
+        {
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
             }
         }
 
-        public Owner GetOwnerById(int id)
+        // GET: OwnerController/Edit/5
+        public ActionResult Edit(int id)
         {
-            using (SqlConnection conn = Connection)
+            return View();
+        }
+
+        // POST: OwnerController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, IFormCollection collection)
+        {
+            try
             {
-                conn.Open();
-
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT Id, [Name], Email, Address, Phone, NeighborhoodId
-                        FROM Owner
-                        WHERE Id = @id";
-
-                    cmd.Parameters.AddWithValue("@id", id);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.Read())
-                    {
-                        Owner owner = new Owner()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Email = reader.GetString(reader.GetOrdinal("Email")),
-                            Address = reader.GetString(reader.GetOrdinal("Address")),
-                            Phone = reader.GetString(reader.GetOrdinal("Phone")),
-                            NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
-                        };
-
-                        reader.Close();
-                        return owner;
-                    }
-
-                    reader.Close();
-                    return null;
-                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
             }
         }
 
-        public Owner GetOwnerByEmail(string email)
+        // GET: WalkerController/Delete/5
+        public ActionResult Delete(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT Id, [Name], Email, Address, Phone, NeighborhoodId
-                        FROM Owner
-                        WHERE Email = @email";
-
-                    cmd.Parameters.AddWithValue("@email", email);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.Read())
-                    {
-                        Owner owner = new Owner()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Email = reader.GetString(reader.GetOrdinal("Email")),
-                            Address = reader.GetString(reader.GetOrdinal("Address")),
-                            Phone = reader.GetString(reader.GetOrdinal("Phone")),
-                            NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
-                        };
-
-                        reader.Close();
-                        return owner;
-                    }
-
-                    reader.Close();
-                    return null;
-                }
-            }
+            return View();
         }
 
-        public void AddOwner(Owner owner)
+        // POST: WalkerController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, IFormCollection collection)
         {
-            using (SqlConnection conn = Connection)
+            try
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                    INSERT INTO Owner ([Name], Email, Phone, Address, NeighborhoodId)
-                    OUTPUT INSERTED.ID
-                    VALUES (@name, @email, @phoneNumber, @address, @neighborhoodId);
-                ";
-
-                    cmd.Parameters.AddWithValue("@name", owner.Name);
-                    cmd.Parameters.AddWithValue("@email", owner.Email);
-                    cmd.Parameters.AddWithValue("@phoneNumber", owner.Phone);
-                    cmd.Parameters.AddWithValue("@address", owner.Address);
-                    cmd.Parameters.AddWithValue("@neighborhoodId", owner.NeighborhoodId);
-
-                    int id = (int)cmd.ExecuteScalar();
-
-                    owner.Id = id;
-                }
+                return RedirectToAction(nameof(Index));
             }
-        }
-
-        public void UpdateOwner(Owner owner)
-        {
-            using (SqlConnection conn = Connection)
+            catch
             {
-                conn.Open();
-
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                            UPDATE Owner
-                            SET 
-                                [Name] = @name, 
-                                Email = @email, 
-                                Address = @address, 
-                                Phone = @phone, 
-                                NeighborhoodId = @neighborhoodId
-                            WHERE Id = @id";
-
-                    cmd.Parameters.AddWithValue("@name", owner.Name);
-                    cmd.Parameters.AddWithValue("@email", owner.Email);
-                    cmd.Parameters.AddWithValue("@address", owner.Address);
-                    cmd.Parameters.AddWithValue("@phone", owner.Phone);
-                    cmd.Parameters.AddWithValue("@neighborhoodId", owner.NeighborhoodId);
-                    cmd.Parameters.AddWithValue("@id", owner.Id);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        public void DeleteOwner(int ownerId)
-        {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                            DELETE FROM Owner
-                            WHERE Id = @id
-                        ";
-
-                    cmd.Parameters.AddWithValue("@id", ownerId);
-
-                    cmd.ExecuteNonQuery();
-                }
+                return View();
             }
         }
     }
