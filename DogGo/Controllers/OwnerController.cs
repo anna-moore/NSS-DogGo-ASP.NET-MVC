@@ -81,13 +81,13 @@ namespace DogGo.Controllers
             }
         }
 
-        // GET: WalkerController/Delete/5
+        // GET: OwnerController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: WalkerController/Delete/5
+        // POST: OwnerController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
