@@ -10,5 +10,9 @@ namespace DogGo.Repositories
     {
         List<Owner> GetAllOwners();
         Owner GetOwnersById(int id);
+        Owner GetOwnerByEmail(string email);
+        void AddOwner(Owner owner);
+        void UpdateOwner(Owner owner);
+        void DeleteOwner(int ownerId );
     }
 }
