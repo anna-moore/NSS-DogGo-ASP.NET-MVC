@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using DogGo.Repositories;
+using System;
 
 namespace DogGo.Controllers
 {
@@ -64,25 +65,35 @@ namespace DogGo.Controllers
         // GET: OwnerController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Owner owner = _ownerRepo.GetOwnersById(id);
+
+            if (owner == null)
+            {
+                return NotFound();
+            }
+
+            return View(owner);
         }
 
         // POST: OwnerController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Owner owner)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _ownerRepo.UpdateOwner(owner);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(owner);
             }
         }
 
         // GET: OwnerController/Delete/5
+
         public ActionResult Delete(int id)
         {
             Owner owner = _ownerRepo.GetOwnersById(id);
@@ -90,19 +101,21 @@ namespace DogGo.Controllers
             return View(owner);
         }
 
-        // POST: OwnerController/Delete/5
+        // POST: OwnersController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Owner owner)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _ownerRepo.DeleteOwner(id);
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception )
             {
-                return View();
+                return View(owner);
             }
         }
+
     }
 }
