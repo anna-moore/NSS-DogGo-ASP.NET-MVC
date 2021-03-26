@@ -1,14 +1,11 @@
 ﻿using DogGo.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DogGo.Repositories
 {
-    public class DogRepository
+    public class DogRepository : IDogRepository
     {
         private readonly IConfiguration _config;
         public DogRepository(IConfiguration config)
@@ -57,6 +54,48 @@ namespace DogGo.Repositories
                     }
                     reader.Close();
                     return dogs;
+                }
+            }
+        }
+
+        public Dog GetDogById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                      SELECT Id, [Name], Breed, Notes, ImageUrl, OwnerId
+                                      FROM Dog
+                                      WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        Dog dog = new Dog()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
+
+                            Notes = reader.IsDBNull(reader.GetOrdinal("Notes")) ? null :
+                                reader.GetString(reader.GetOrdinal("Notes")),
+
+                            ImageUrl = reader.IsDBNull(reader.GetOrdinal("ImageUrl")) ? null :
+                                reader.GetString(reader.GetOrdinal("ImageUrl")),
+
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                        };
+
+                        reader.Close();
+                        return dog;
+                    }
+                    reader.Close();
+                    return null;
                 }
             }
         }
