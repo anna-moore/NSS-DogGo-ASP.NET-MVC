@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+//currently create form and edit form are displaying correctly
+//neither of this forms are submitting correctly
+
 namespace DogGo.Controllers
 {
     public class DogsController : Controller
