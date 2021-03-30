@@ -22,10 +22,11 @@ namespace DogGo.Controllers
         public ActionResult Index()
         {
             int ownerId = GetCurrentUserId();
-
             List<Dog> dogs = _dogRepo.GetDogsByOwnerId(ownerId);
             return View(dogs);
         }
+
+
 
         // GET: DogController/Details/5
         public ActionResult Details(int id)
@@ -52,6 +53,9 @@ namespace DogGo.Controllers
         {
             try
             {
+                // update the dogs OwnerId to the current user's Id
+                dog.OwnerId = GetCurrentUserId();
+
                 _dogRepo.AddDog(dog);
                 return RedirectToAction("Index");
             }

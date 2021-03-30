@@ -106,21 +106,22 @@ namespace DogGo.Repositories
         //add a dog to the database
         public void AddDog(Dog dog)
         {
-            using(SqlConnection conn = Connection)
+            using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                using(SqlCommand cmd = conn.CreateCommand())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                                       INSERT INTO Dog ([Name], Breed, Notes, ImageUrl, OwnerId)
-                                      OUTPUT INSERTED.ID
-                                      VALUES (@name, @breed, @notes, @imageUrl, @ownerId);";
+                INSERT INTO Dog ([Name], OwnerId, Breed, Notes, ImageUrl)
+                OUTPUT INSERTED.ID
+                VALUES (@name, @ownerId, @breed, @notes, @imageUrl);
+            ";
 
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
 
-                    //if dog notes is null (SQL null !== C# null)
+                    // nullable columns
                     if (dog.Notes == null)
                     {
                         cmd.Parameters.AddWithValue("@notes", DBNull.Value);
@@ -129,7 +130,7 @@ namespace DogGo.Repositories
                     {
                         cmd.Parameters.AddWithValue("@notes", dog.Notes);
                     }
-                    //if dog ImageURL is null
+
                     if (dog.ImageUrl == null)
                     {
                         cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
@@ -139,8 +140,11 @@ namespace DogGo.Repositories
                         cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
                     }
 
-                    int id = (int)cmd.ExecuteScalar();
-                    dog.Id = id;
+
+                    int newlyCreatedId = (int)cmd.ExecuteScalar();
+
+                    dog.Id = newlyCreatedId;
+
                 }
             }
         }
