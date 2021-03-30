@@ -145,11 +145,15 @@ namespace DogGo.Controllers
             }
         }
 
+        // GET: the login view/form with empty text box
+        //create in view is an empthy form best match
         public ActionResult Login()
         {
             return View();
         }
 
+        //POST: for the login form 
+        //validate that user is in database
         [HttpPost]
         public async Task<ActionResult> Login(LoginViewModel viewModel)
         {
@@ -161,11 +165,11 @@ namespace DogGo.Controllers
             }
 
             List<Claim> claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, owner.Id.ToString()),
-        new Claim(ClaimTypes.Email, owner.Email),
-        new Claim(ClaimTypes.Role, "DogOwner"),
-    };
+            {
+                new Claim(ClaimTypes.NameIdentifier, owner.Id.ToString()),
+                new Claim(ClaimTypes.Email, owner.Email),
+                new Claim(ClaimTypes.Role, "DogOwner"),
+            };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(
                 claims, CookieAuthenticationDefaults.AuthenticationScheme);
