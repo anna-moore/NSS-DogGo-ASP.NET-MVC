@@ -154,6 +154,7 @@ namespace DogGo.Controllers
 
         //POST: for the login form 
         //validate that user is in database
+        //this is creating a cookie
         [HttpPost]
         public async Task<ActionResult> Login(LoginViewModel viewModel)
         {
@@ -179,6 +180,13 @@ namespace DogGo.Controllers
                 new ClaimsPrincipal(claimsIdentity));
 
             return RedirectToAction("Index", "Dogs");
+        }
+
+        //LOG OUT function 
+        public async Task<ActionResult> LogOut()
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
 
     }
