@@ -7,12 +7,9 @@ namespace DogGo.Models.ViewModels
 {
     public class WalkerFormViewModel
     {
-        public Walker walker { get; set; }
+        public Walker Walker { get; set; }
         public List<Walk> Walks { get; set;  }
 
         //public Neighborhood neighborhood { get; set; }
-
-
-
     }
 }
