@@ -62,6 +62,7 @@ namespace DogGo.Repositories
                 }
             }
         }
+
         //access walkers by their ID
         public Walker GetWalkerById(int id)
         {
@@ -71,9 +72,10 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, [Name], ImageUrl, NeighborhoodId
-                        FROM Walker
-                        WHERE Id = @id
+                        SELECT w.Id, w.[Name], w.ImageUrl, w.NeighborhoodId, n.Name [NeighborhoodName]
+                        FROM Walker w
+                        JOIN  Neighborhood n ON w.NeighborhoodId = n.id
+                        WHERE w.Id = @id
                     ";
 
                     cmd.Parameters.AddWithValue("@id", id);
@@ -89,6 +91,11 @@ namespace DogGo.Repositories
                             ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
                             NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
                         };
+                        walker.Neighborhood = new Neighborhood
+                        {
+                            Name = reader.GetString(reader.GetOrdinal("NeighborhoodName"))
+                        };
+                        
 
                         reader.Close();
                         return walker;

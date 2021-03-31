@@ -112,10 +112,10 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                INSERT INTO Dog ([Name], OwnerId, Breed, Notes, ImageUrl)
-                OUTPUT INSERTED.ID
-                VALUES (@name, @ownerId, @breed, @notes, @imageUrl);
-            ";
+                                    INSERT INTO Dog ([Name], OwnerId, Breed, Notes, ImageUrl)
+                                    OUTPUT INSERTED.ID
+                                    VALUES (@name, @ownerId, @breed, @notes, @imageUrl);
+                                    ";
 
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
